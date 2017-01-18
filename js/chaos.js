@@ -272,7 +272,7 @@ Particle.prototype = (function(object) {
 // 		// this.speed.add(d);
 // 		// Maybe this function will be necessary
 // 	},
-	update: function() {
+	update: function() { // Merge this function into the render function
     if (!this.isInitial) {
       this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
       this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5); // This 0.5 should be made into a config variable

@@ -202,8 +202,6 @@ Node.prototype = (function(object) { // Having this prototype is an optimization
 			}
 		}
 
-		// Or is it better to render here?
-
 		this.draw(ctx);
 
 	},
@@ -253,10 +251,11 @@ function Particle(destinationNode, lastParticle) {
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() * window.innerHeight;
   }
-  // else {
-    // this.isInitial = false;
-    // this.update();
-  // }
+  else {
+    this.isInitial = false;
+    this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
+    this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5);
+  }
   // Vector.call(this.x, this.y);
 }
 
@@ -266,18 +265,7 @@ Particle.prototype = (function(object) { // Having this prototype is an optimiza
 	return self;
 }) ({
 
-  isInitial: false,
-
-// 	addSpeed: function(d) {
-// 		// this.speed.add(d);
-// 		// Maybe this function will be necessary
-// 	},
-	// update: function() { // Merge this function into the render function
-  //   if (!this.isInitial) {
-  //     this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
-  //     this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5); // This 0.5 should be made into a config variable
-  //   }
-	// },
+  // isInitial: false,
 
 	render: function(ctx) {
     if (this.isInitial) {
@@ -287,7 +275,7 @@ Particle.prototype = (function(object) { // Having this prototype is an optimiza
       this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
       this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5); // This 0.5 should be made into a config variable
     }
-    this.draw(ctx); // This is an ugly way of organizing these functions.
+    this.draw(ctx);
 	},
 
 	draw: function(ctx) {
@@ -337,8 +325,7 @@ function Fractal() {
     var i, destinationNode, newParticle;
     if (this.nodes.length >= 3) {
       if (this.particles.length < 1) {
-        // Make a random particle
-        newParticle = new Particle(this.nodes[Math.floor(Math.random() * this.nodes.length)]);
+        newParticle = new Particle(this.nodes[Math.floor(Math.random() * this.nodes.length)]); // Make a random particle
         this.particles.push(newParticle);
         this.lastParticle = newParticle;
         this.particleNum--;
@@ -350,7 +337,6 @@ function Fractal() {
         this.lastParticle = newParticle;
         this.particleNum--;
       }
-      // console.log(this.particles);
     }
   };
 
@@ -365,15 +351,15 @@ function Fractal() {
 
 
   this.renderNodes = function(context) {
-    var i, node;
-    for (i = 0; i < this.nodes.length; i++) {
+    var i, node, len;
+    for (i = 0, len = this.nodes.length; i < len; i++) {
       node = this.nodes[i];
       if (node.dragging) {
 				node.drag(this.mouse);
 			}
 			node.render(context);
 			if (node.destroyed) {
-				fractal.nodes.splice(i, 1);
+				this.nodes.splice(i, 1);
 				len--;
 				i--;
 			}
@@ -383,7 +369,7 @@ function Fractal() {
   this.renderParticles = function(context) {
     var particle, i, len;
     for (i = 0, len = this.particles.length; i < len; i++) {
-      particle = this.particles[i]
+      particle = this.particles[i];
       particle.render(context);
     }
   };

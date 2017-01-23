@@ -136,7 +136,7 @@ Vector.prototype = {
 
 // Node
 
-function Node(x, y, radius, internalColor, externalColor) {
+function Node(x, y, radius, internalColor, externalColor) { // Color and radius ought to be defined internally, perhaps even in the prototype.
 	Vector.call(this, x, y);
 	this.idealRadius = radius;
 	this.currentRadius = this.idealRadius * 0.5 // Start the radius off as half of what it should be
@@ -145,12 +145,12 @@ function Node(x, y, radius, internalColor, externalColor) {
   this.externalColor = externalColor;
 }
 
-Node.prototype = (function(object) {
+Node.prototype = (function(object) { // Having this prototype is an optimization for when Nodes are created in greater numbers
 	var self = new Vector(0, 0), property;
 	for (property in object) self[property] = object[property];
 	return self;
 }) ({
-	isMouseOver: true, // Because the Node starts withthe mouse on top of it.
+	isMouseOver: true, // Because the Node starts with the mouse on top of it.
 	dragging: false,
 	destroyed: false,
 	dragDistance: null,
@@ -187,7 +187,7 @@ Node.prototype = (function(object) {
 		}
 
 		// Render the fractal
-		this.deltaRadius = (this.deltaRadius + (this.idealRadius - this.currentRadius) * 0.07) * 0.95; // Play around with these numbers, they're not necessarily ideal.
+		this.deltaRadius = (this.deltaRadius + (this.idealRadius - this.currentRadius) * 0.07) * 0.95; // Play around with these numbers, they're not necessarily ideal. They determine how the node changes in size.
 
 		this.currentRadius += this.deltaRadius;
 
@@ -212,7 +212,7 @@ Node.prototype = (function(object) {
 		var grd;
 		ctx.save();
 
-		// The below code will be for the outer gradient of each node.
+		// The below code would be for the outer gradient of each node.
 
 		// grd = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, 0);
 		// grd.addColorStop(0, "rgba(0, 0, 0, 0.1)");
@@ -260,7 +260,7 @@ function Particle(destinationNode, lastParticle) {
   Vector.call(this.x, this.y);
 }
 
-Particle.prototype = (function(object) {
+Particle.prototype = (function(object) { // Having this prototype is an optimization for when Nodes are created in greater numbers
 	var self = new Vector(0, 0), property;
 	for (property in object) self[property] = object[property];
 	return self;

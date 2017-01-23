@@ -140,7 +140,7 @@ function Node(x, y, radius, internalColor, externalColor) { // Color and radius 
 	Vector.call(this, x, y);
 	this.idealRadius = radius;
 	this.currentRadius = this.idealRadius * 0.5 // Start the radius off as half of what it should be
-  this.deltaRadius = 0;
+  // this.deltaRadius = 0;
   this.internalColor = internalColor;
   this.externalColor = externalColor;
 }
@@ -253,11 +253,11 @@ function Particle(destinationNode, lastParticle) {
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() * window.innerHeight;
   }
-  else {
-    this.isInitial = false;
-    this.update();
-  }
-  Vector.call(this.x, this.y);
+  // else {
+    // this.isInitial = false;
+    // this.update();
+  // }
+  // Vector.call(this.x, this.y);
 }
 
 Particle.prototype = (function(object) { // Having this prototype is an optimization for when Nodes are created in greater numbers
@@ -266,28 +266,30 @@ Particle.prototype = (function(object) { // Having this prototype is an optimiza
 	return self;
 }) ({
 
-  // isInitial: false,
+  isInitial: false,
 
 // 	addSpeed: function(d) {
 // 		// this.speed.add(d);
 // 		// Maybe this function will be necessary
 // 	},
-	update: function() { // Merge this function into the render function
-    if (!this.isInitial) {
+	// update: function() { // Merge this function into the render function
+  //   if (!this.isInitial) {
+  //     this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
+  //     this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5); // This 0.5 should be made into a config variable
+  //   }
+	// },
+
+	render: function(ctx) {
+    if (this.isInitial) {
+      return;
+    }
+    if (this.destinationNode.dragging) {
       this.x = (this.lastParticle.x + this.destinationNode.x) * (0.5);
       this.y = (this.lastParticle.y + this.destinationNode.y) * (0.5); // This 0.5 should be made into a config variable
     }
+    this.draw(ctx); // This is an ugly way of organizing these functions.
 	},
 
-	render: function(ctx) {
-    // if (destinationNode.dragging) {
-    //   this.update();
-    // }
-    if (!this.isInitial) {
-      this.draw(ctx); // This is an ugly way of organizing these functions.
-    }
-	},
-//
 	draw: function(ctx) {
     ctx.save()
 
@@ -318,6 +320,7 @@ function Fractal() {
   this.particleNum = 50;
 
   this.lastParticle = null;
+  this.mouse = new Vector();
 
   // Functions:
 
@@ -325,12 +328,12 @@ function Fractal() {
     this.nodes.push(newNode);
   };
 
-  this.addParticles = function(num) {
-    this.particleNum += num;
-    this.updateParticles();
-  };
+  // this.addParticles = function(num) {
+  //   this.particleNum += num;
+  //   this.updateParticles();
+  // };
 
-  this.updateParticles = function() {
+  this.addParticles = function() {
     var i, destinationNode, newParticle;
     if (this.nodes.length >= 3) {
       if (this.particles.length < 1) {
@@ -347,6 +350,7 @@ function Fractal() {
         this.lastParticle = newParticle;
         this.particleNum--;
       }
+      // console.log(this.particles);
     }
   };
 
@@ -354,10 +358,10 @@ function Fractal() {
     this.particles = [];
   };
 
-  this.clearEverything = function() {
-    this.particles = [];
-    this.nodes = [];
-  };
+  // this.clearEverything = function() {
+  //   this.particles = [];
+  //   this.nodes = [];
+  // };
 
 
   this.renderNodes = function(context) {
@@ -365,7 +369,7 @@ function Fractal() {
     for (i = 0; i < this.nodes.length; i++) {
       node = this.nodes[i];
       if (node.dragging) {
-				node.drag(mouse);
+				node.drag(this.mouse);
 			}
 			node.render(context);
 			if (node.destroyed) {
@@ -409,8 +413,6 @@ function Fractal() {
 			bufferCvs, bufferCtx,
 			screenWidth, screenHeight,
 			mouse = new Vector(),
-			nodes = [],
-			particles = [],
 			grad,
 			gui, control,
       fractal;
@@ -436,12 +438,11 @@ function Fractal() {
 	}
 
 	function mouseMove(e) {
-		mouse.set(e.clientX, e.clientY);
-
+		fractal.mouse.set(e.clientX, e.clientY);
 		var i, node, hit = false;
-		for (i = nodes.length-1 ; i >= 0; i--) {
-			node = nodes[i];
-			if ((!hit && node.hitTest(mouse))|| node.dragging) {
+		for (i = fractal.nodes.length-1 ; i >= 0; i--) {
+			node = fractal.nodes[i];
+			if ((!hit && node.hitTest(fractal.mouse))|| node.dragging) {
 				node.isMouseOver = hit = true;
 			}
 			else {
@@ -453,9 +454,9 @@ function Fractal() {
 	}
 
 	function mouseDown(e) {
-		for (var i = nodes.length - 1; i >= 0; i--) {
-			if (nodes[i].isMouseOver) {
-				nodes[i].startDrag(mouse);
+		for (var i = fractal.nodes.length - 1; i >= 0; i--) {
+			if (fractal.nodes[i].isMouseOver) {
+				fractal.nodes[i].startDrag(fractal.mouse);
 				return;
 			}
 		}
@@ -463,8 +464,8 @@ function Fractal() {
   }
 
 	function mouseUp(e) {
-		for (var i = 0, len = nodes.length; i < len; i++) {
-      node = nodes[i];
+		for (var i = 0, len = fractal.nodes.length; i < len; i++) {
+      node = fractal.nodes[i];
 			if (node.dragging) {
 				node.endDrag();
 				break;
@@ -473,9 +474,9 @@ function Fractal() {
 	}
 
 	function doubleClick(e) {
-		for (var i = nodes.length - 1; i >= 0; i--) {
-			if (nodes[i].isMouseOver) {
-				nodes[i].collapse();
+		for (var i = fractal.nodes.length - 1; i >= 0; i--) {
+			if (fractal.nodes[i].isMouseOver) {
+				fractal.nodes[i].collapse();
 				break;
 			}
 		}
@@ -494,13 +495,13 @@ function Fractal() {
 	canvas.addEventListener("mouseup", mouseUp, false);
 	canvas.addEventListener("dblclick", doubleClick, false);
 
-  fractal = new Fractal(nodes);
+  fractal = new Fractal();
 
 	// GUI
 
 	gui = new dat.GUI();
   gui.add(fractal, "particleNum");
-  gui.add(fractal, "updateParticles");
+  gui.add(fractal, "addParticles").name("Insert Particles");
   gui.add(fractal, "clearParticles");
   gui.close();
 

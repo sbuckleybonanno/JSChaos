@@ -240,7 +240,7 @@ function Particle(destinationNode, lastParticle) {
 //  // this.speed = new Vector(); // This might be necessary for animations later on;
 
   // More stuff to add configs to later:
-  this.color = "rgba(230, 218, 218, 1)";;
+  this.color = "rgba(230, 218, 218, 1)";
 
   // this.isInitial = isInitial || false;
   this.destinationNode = destinationNode;
@@ -396,7 +396,7 @@ function Fractal() {
 
 	// Vars
 	var canvas, context,
-			bufferCvs, bufferCtx,
+			//bufferCvs, bufferCtx,
 			screenWidth, screenHeight,
 			mouse = new Vector(),
 			grad,
@@ -408,10 +408,10 @@ function Fractal() {
 	function resize(e) {
 		screenWidth = canvas.width = window.innerWidth;
 		screenHeight = canvas.height = window.innerHeight;
-		bufferCvs.width = screenWidth;
-		bufferCvs.height = screenHeight;
+		//bufferCvs.width = screenWidth;
+		//bufferCvs.height = screenHeight;
 		context = canvas.getContext("2d");
-		bufferCtx = bufferCvs.getContext("2d");
+		//bufferCtx = bufferCvs.getContext("2d");
 
 		var cx = canvas.width * 0.5,
 				cy = canvas.height * 0.5;
@@ -471,7 +471,7 @@ function Fractal() {
 	// Init
 
 	canvas = document.getElementById("c");
-	bufferCvs = document.createElement("canvas");
+	// bufferCvs = document.createElement("canvas");
 
 	window.addEventListener("resize", resize, false);
 	resize(null);
